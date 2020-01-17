@@ -2,7 +2,7 @@
   <div>
     <nav class="navbar navbar-dark bg-dark sticky-top">
       <div class="container">
-        <a class="navbar-brand" href="/">Производство керамзитобетонных блоков</a>
+        <a class="navbar-brand" href="/">Производство</a>
       </div>
     </nav>
     <div class="container">

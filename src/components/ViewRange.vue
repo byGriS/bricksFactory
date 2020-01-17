@@ -1,6 +1,6 @@
 <template>
     <div>
-      <h1>Общее кол-во блоков за период: {{countBricks}}</h1>
+      <h1>Общее кол-во резов за период: {{countBricks}}</h1>
     </div>
 </template>
 <script>
@@ -14,7 +14,7 @@ export default {
   },
   computed:{
       countBricks(){
-          return this.bricks * 4;
+          return this.bricks;
       }
   },
   methods: {

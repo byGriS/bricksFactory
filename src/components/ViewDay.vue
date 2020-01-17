@@ -1,6 +1,6 @@
 <template>
   <div>
-      <h1>Общее кол-во блоков за день: {{countBricks}}</h1>
+      <h1>Общее кол-во резов: {{countBricks}}</h1>
     <div>
         <div v-for="brick in bricks">
             <label>Время отреза:	</label>&#8195;{{brick.dt}}
@@ -19,16 +19,18 @@ export default {
   },
   computed:{
       countBricks(){
-          return this.bricks.length * 4;
+          return this.bricks.length;
       }
   },
   methods: {
     updateValue() {
      this.$http
         .post("http://c98744oh.beget.tech/get.php",{
+        //.post("http://bricks.loc/get.php",{
             dt: this.selectDay
         })
         .then(function(response){
+          
             return response.json();
         })
         .then(function(data){

@@ -2,12 +2,12 @@
 class SqlDB
 {
 	private static $dbHost = 'localhost';
-	private static $dbDataBase = 'c98744oh_brick';
+	/*private static $dbDataBase = 'c98744oh_brick';
 	private static $dbUserName = 'c98744oh_brick';
-	private static $password = 'c98744oh_brick_2019';
-	/*private static $dbDataBase = 'bricks';
+	private static $password = 'c98744oh_brick_2019';*/
+	private static $dbDataBase = 'bricks';
 	private static $dbUserName = 'root';
-	private static $password = '';*/
+	private static $password = '';
 	private static $pdo;
 
 	public static function SQLExecute($query)
