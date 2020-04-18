@@ -1,6 +1,6 @@
 <template>
     <div>
-      <h1>Общее кол-во резов за период: {{countBricks}}</h1>
+      <h2>Общее кол-во резов за период: {{countBricks}}</h2>
     </div>
 </template>
 <script>
