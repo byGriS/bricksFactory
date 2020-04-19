@@ -7,7 +7,7 @@
     </nav>
     <div class="container">
       <div class="row">
-        <div class="col-4">
+        <div class="col-md-4">
           <label>Вариан просмотра</label>
           <br />
           <input type="radio" id="workShift" value="shift" v-model="picked" />
@@ -19,10 +19,10 @@
           <input type="radio" id="perRange" value="range" v-model="picked" />
           <label for="perRange">За диапазон</label>
         </div>
-        <div class="col-4">
+        <div class="col-md-4">
           <Shift v-if="picked=='shift'" />
         </div>
-        <div class="col-4">
+        <div class="col-md-4">
           <div v-if="picked=='day' || picked=='shift'">
             <v-day-selector v-model="date" />
           </div>
