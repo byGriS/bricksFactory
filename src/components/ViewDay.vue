@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3>Общее кол-во резов: {{countBricks}}</h3>
-    <chart :chart-data="chartdata" ref="chartElem"/>
+    <highcharts :options="chartOptions"></highcharts>
     <div>
       <list-bricks :bricks="bricks" />
     </div>
@@ -9,24 +9,27 @@
 </template>
 <script>
 import ListBricks from "./ListBricks";
-import Chart from "./Chart.js";
 
 export default {
   components: {
-    ListBricks,
-    Chart
+    ListBricks
   },
   props: { selectDay: "" },
   data() {
     return {
       timer: null,
       bricks: [],
-      chartdata: {
-        datasets: [
+      chartOptions: {
+        chart: { type: "line" },
+        title: { text: "" },
+        xAxis: { type: "datetime" },
+        yAxis: { title: { text: "" } },
+        legend: { enabled: false },
+        series: [
           {
-            //backgroundColor: "#f87979",
-            data: [],
-            steppedLine: "middle"
+            marker: { enabled: false, symbol: null },
+            name: "Блоки",
+            data: []
           }
         ]
       }
@@ -48,25 +51,78 @@ export default {
           return response.json();
         })
         .then(function(data) {
-          console.log(this.chartdata.datasets[0]);
           this.bricks = data;
-          for (let i = this.chartdata.datasets[0].data.length; i < data.length; i++) {
-            this.chartdata.datasets[0].data.push({
-              x: new Date(data[i]["dt"]),
-              y: i
+
+          this.chartOptions.series.push({
+            marker: { enabled: false, symbol: null },
+            name: "Блоки",
+            data: []
+          });
+
+          var indexSeries = 1;
+          for (
+            let i = this.chartOptions["series"][0].data.length;
+            i < data.length;
+            i++
+          ) {
+            this.chartOptions["series"][0].data.push({
+              x: this.$moment.utc(data[i]["dt"]).valueOf(),
+              y: i + 1
             });
+            if (i == 0) var preDT = this.$moment.utc(data[i]["dt"]).valueOf();
+            else {
+              if (this.chartOptions["series"][0].data[this.chartOptions["series"][0].data.length - 1].x - preDT > 300000 && 
+                this.chartOptions["series"][0].data[this.chartOptions["series"][0].data.length - 1].x - preDT < 3600000) {
+                this.chartOptions.series.push({
+                  marker: { enabled: false, symbol: null },
+                  name: "Блоки",
+                  data: [],
+                  color: "#ffaa00"
+                });
+                this.chartOptions["series"][indexSeries].data.push({
+                  x: preDT,
+                  y: i
+                });
+                this.chartOptions["series"][indexSeries].data.push({
+                  x: this.$moment.utc(data[i]["dt"]).valueOf(),
+                  y: i + 1
+                });
+                indexSeries++;
+              }
+              if (this.chartOptions["series"][0].data[this.chartOptions["series"][0].data.length - 1].x - preDT > 3600000) {
+                this.chartOptions.series.push({
+                  marker: { enabled: false, symbol: null },
+                  name: "Блоки",
+                  data: [],
+                  color: "#ff0000"
+                });
+                this.chartOptions["series"][indexSeries].data.push({
+                  x: preDT,
+                  y: i
+                });
+                this.chartOptions["series"][indexSeries].data.push({
+                  x: this.$moment.utc(data[i]["dt"]).valueOf(),
+                  y: i + 1
+                });
+                indexSeries++;
+              }
+              preDT = this.$moment.utc(data[i]["dt"]).valueOf();
+            }
           }
-          this.$refs.chartElem.update();
         });
     }
   },
   watch: {
     selectDay: function(val) {
+      this.chartOptions["series"][0].data = [];
+      this.chartOptions.series = [];
       this.updateValue();
     }
   },
   created() {
     var self = this;
+    this.chartOptions["series"][0].data = [];
+    this.chartOptions.series = [];
     this.timer = setInterval(function() {
       self.updateValue();
     }, 3000);

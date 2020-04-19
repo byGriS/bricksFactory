@@ -20,7 +20,7 @@
           <label for="perRange">За диапазон</label>
         </div>
         <div class="col-4">
-          <Shift v-if="picked=='shift'" :shift="shift" />
+          <Shift v-if="picked=='shift'" />
         </div>
         <div class="col-4">
           <div v-if="picked=='day' || picked=='shift'">
@@ -31,8 +31,8 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-6 col-md-7 col-lg-8 col-xl-9">
-        <ViewShift v-if="picked=='shift'" />
+      <div class="">
+        <ViewShift v-if="picked=='shift'" :selectDay="date"/>
         <ViewDay v-if="picked=='day'" :selectDay="date" />
         <ViewRange v-if="picked=='range'" :range="range" />
       </div>
@@ -62,12 +62,6 @@ export default {
       range: {},
       date: null,
       picked: "shift",
-      shift: {
-        shiftStartHour: 8,
-        shiftStartMinute: 0,
-        shiftEndHour: 17,
-        shiftEndMinute: 0
-      }
     };
   },
   watch: {
