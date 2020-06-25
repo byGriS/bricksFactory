@@ -19,3 +19,7 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+
+db.php
+/PC/Bricks/.vs
+/PC/Bricks/Bricks/bin/Debug

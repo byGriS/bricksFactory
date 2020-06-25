@@ -1,0 +1,9 @@
+C:\OSPanel\domains\brick.loc\PC\Bricks\Bricks\bin\Debug\Bricks.exe.config
+C:\OSPanel\domains\brick.loc\PC\Bricks\Bricks\bin\Debug\Bricks.exe
+C:\OSPanel\domains\brick.loc\PC\Bricks\Bricks\bin\Debug\Bricks.pdb
+C:\OSPanel\domains\brick.loc\PC\Bricks\Bricks\obj\Debug\Bricks.csprojAssemblyReference.cache
+C:\OSPanel\domains\brick.loc\PC\Bricks\Bricks\obj\Debug\Bricks.Form1.resources
+C:\OSPanel\domains\brick.loc\PC\Bricks\Bricks\obj\Debug\Bricks.Properties.Resources.resources
+C:\OSPanel\domains\brick.loc\PC\Bricks\Bricks\obj\Debug\Bricks.csproj.GenerateResource.cache
+C:\OSPanel\domains\brick.loc\PC\Bricks\Bricks\obj\Debug\Bricks.exe
+C:\OSPanel\domains\brick.loc\PC\Bricks\Bricks\obj\Debug\Bricks.pdb

@@ -28,6 +28,12 @@
       <label v-else>{{selectedShift.shiftEndMinute}}</label>
       <label>мин</label>
     </div>
+    <div>
+      <label class="marginR10">норматив выработки в час:</label>
+      <input v-if="editting" class="form-control inputTime" v-model="selectedShift.norm" />
+      <label v-else>{{selectedShift.norm}}</label>
+      <label class="marginR10">шт</label>
+    </div>
     <button class="btn btn-primary marginT10" @click="changeShift">{{btnChange}}</button>
   </div>
 </template>
@@ -46,10 +52,18 @@ export default {
       for (let i = 0; i < this.shifts.length; i++) {
         if (this.shifts[i].id == this.selectShiftId) return this.shifts[i];
       }
+      return {
+        id: 1,
+        shiftStartHour: 0,
+        shiftStartMinute: 0,
+        shiftEndHour: 23,
+        shiftEndMinute: 59,
+        norm: 100
+      };
     },
     btnChange() {
       if (this.editting) return "Сохранить";
-      else return "Изменить время смены";
+      else return "Изменить параметры смены";
     }
   },
   watch: {
@@ -64,18 +78,21 @@ export default {
       }
     },
     addShift() {
+      if (!this.editting && prompt("Введите пароль") != this.$store.state.pass) return;
       this.$http
         .post("http://c98744oh.beget.tech/addShift.php", {
           shiftStartHour: this.selectedShift.shiftStartHour,
           shiftStartMinute: this.selectedShift.shiftStartMinute,
           shiftEndHour: this.selectedShift.shiftEndHour,
-          shiftEndMinute: this.selectedShift.shiftEndMinute
+          shiftEndMinute: this.selectedShift.shiftEndMinute,
+          norm: this.selectedShift.norm
         })
         .then(function(response) {
           this.updateListShifts(true);
         });
     },
     deleteShift() {
+      if (!this.editting && prompt("Введите пароль") != this.$store.state.pass) return;
       if (this.shifts.length == 1) {
         alert("Кол-во смен: 1. Нельзя удалять все смены");
         return;
@@ -90,8 +107,10 @@ export default {
         });
     },
     changeShift() {
+      if (!this.editting && prompt("Введите пароль") != this.$store.state.pass) return;
       this.editting = !this.editting;
-      if (this.selectedShift.shiftEndHour>=24){
+      if (this.editting) return;      
+      if (this.selectedShift.shiftEndHour >= 24) {
         this.selectedShift.shiftEndHour = 23;
         this.selectedShift.shiftEndMinute = 59;
       }
@@ -101,11 +120,13 @@ export default {
           shiftStartMinute: this.selectedShift.shiftStartMinute,
           shiftEndHour: this.selectedShift.shiftEndHour,
           shiftEndMinute: this.selectedShift.shiftEndMinute,
+          norm: this.selectedShift.norm,
           id: this.selectedShift.id
         })
         .then(function(response) {
           this.updateListShifts();
           this.$store.state.shift = this.selectedShift;
+          this.$store.state.norm = this.selectedShift.norm;
         });
     },
     updateListShifts(newShift = false) {
@@ -122,9 +143,11 @@ export default {
               shiftStartHour: data[i].starthour,
               shiftStartMinute: data[i].startminute,
               shiftEndHour: data[i].endhour,
-              shiftEndMinute: data[i].endminute
+              shiftEndMinute: data[i].endminute,
+              norm: data[i].norm
             });
           }
+          this.selectShiftId = this.shifts[0].id;
           if (newShift)
             this.selectShiftId = this.shifts[this.shifts.length - 1].id;
         });
@@ -139,14 +162,15 @@ export default {
 <style scoped>
 .marginR10 {
   margin-right: 10px;
+  margin-left: 10px;
 }
 .marginT10 {
   margin: 10px 0 !important;
 }
 .label50 {
   width: 50px;
-  margin-top: 15px;
-  margin-right: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 .inputTime {
   display: inline-block;

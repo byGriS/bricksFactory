@@ -5,9 +5,9 @@ class SqlDB
 	/*private static $dbDataBase = 'c98744oh_brick';
 	private static $dbUserName = 'c98744oh_brick';
 	private static $password = 'c98744oh_brick_2019';*/
-	private static $dbDataBase = 'bricks';
+	private static $dbDataBase = 'test';
 	private static $dbUserName = 'root';
-	private static $password = '';
+	private static $password = 'root';
 	private static $pdo;
 
 	public static function SQLExecute($query)

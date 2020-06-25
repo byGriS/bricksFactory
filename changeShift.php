@@ -7,7 +7,8 @@ if (!empty($_POST)) {
   $command = "update shifts set starthour = '".$_POST['shiftStartHour']."',
    startminute = '".$_POST['shiftStartMinute']."', 
    endhour = '".$_POST['shiftEndHour']."', 
-   endminute = '".$_POST['shiftEndMinute']."' where id = '".$_POST['id']."'";
+   endminute = '".$_POST['shiftEndMinute']."',
+   norm = '".$_POST['norm']."' where id = '".$_POST['id']."'";
 	SqlDB::SQLExecute($command);	
 	echo "1";
 }

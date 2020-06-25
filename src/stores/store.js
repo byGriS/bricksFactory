@@ -9,7 +9,10 @@ export default new Vuex.Store({
       shiftStartHour: 8,
       shiftStartMinute: 0,
       shiftEndHour: 17,
-      shiftEndMinute: 0
-    }
+      shiftEndMinute: 0,
+      norm: 100
+    },
+    norm: 100,
+    pass: "195"
   }
 })
