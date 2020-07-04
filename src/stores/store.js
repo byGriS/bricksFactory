@@ -13,6 +13,7 @@ export default new Vuex.Store({
       norm: 100
     },
     norm: 100,
-    pass: "195"
+    pass: "195",
+    host: "http://u0838029bricks.isp.regruhosting.ru/"
   }
 })

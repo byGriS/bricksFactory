@@ -62,13 +62,13 @@ export default {
       return this.bricks.length;
     },
     mercuriy() {
-      return this.mercuriyA + this.mercuriyR;
+      return this.mercuriyA;
     }
   },
   methods: {
     updateValue() {
       this.$http
-        .post("http://c98744oh.beget.tech/get.php", {
+        .post(this.$store.state.host + "get.php", {
           //.post("http://bricks.loc/get.php",{
           dt: this.selectDay
         })
@@ -144,6 +144,7 @@ export default {
           let counters = data.counters;
           if (counters.length > 0) {
             this.mercuriyA = counters[counters.length - 1]["mercuriyA"] - counters[0]["mercuriyA"];
+            console.log(this.mercuriyA);
             this.mercuriyR = counters[counters.length - 1]["mercuriyR"] - counters[0]["mercuriyR"];
             this.pulsar = counters[counters.length - 1]["pulsar"] - counters[0]["pulsar"];
           }

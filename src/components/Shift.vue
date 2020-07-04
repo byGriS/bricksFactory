@@ -80,7 +80,7 @@ export default {
     addShift() {
       if (!this.editting && prompt("Введите пароль") != this.$store.state.pass) return;
       this.$http
-        .post("http://c98744oh.beget.tech/addShift.php", {
+        .post(this.$store.state.host + "addShift.php", {
           shiftStartHour: this.selectedShift.shiftStartHour,
           shiftStartMinute: this.selectedShift.shiftStartMinute,
           shiftEndHour: this.selectedShift.shiftEndHour,
@@ -98,7 +98,7 @@ export default {
         return;
       }
       this.$http
-        .post("http://c98744oh.beget.tech/deleteShift.php", {
+        .post(this.$store.state.host + "deleteShift.php", {
           id: this.selectedShift.id
         })
         .then(function(response) {
@@ -115,7 +115,7 @@ export default {
         this.selectedShift.shiftEndMinute = 59;
       }
       this.$http
-        .post("http://c98744oh.beget.tech/changeShift.php", {
+        .post(this.$store.state.host + "changeShift.php", {
           shiftStartHour: this.selectedShift.shiftStartHour,
           shiftStartMinute: this.selectedShift.shiftStartMinute,
           shiftEndHour: this.selectedShift.shiftEndHour,
@@ -131,7 +131,7 @@ export default {
     },
     updateListShifts(newShift = false) {
       this.$http
-        .post("http://c98744oh.beget.tech/getShift.php")
+        .post(this.$store.state.host + "getShift.php")
         .then(function(response) {
           return response.json();
         })

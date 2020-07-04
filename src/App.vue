@@ -2,7 +2,7 @@
   <div>
     <nav class="navbar navbar-dark bg-dark sticky-top">
       <div class="container">
-        <a class="navbar-brand" href="/">Производство</a>
+        <a class="navbar-brand" :class="error?'fault':'ok'" href="/">Производство</a>
       </div>
     </nav>
     <div class="container">
@@ -31,8 +31,8 @@
           </div>
         </div>
       </div>
-      <div class="">
-        <ViewShift v-if="picked=='shift'" :selectDay="date"/>
+      <div class>
+        <ViewShift v-if="picked=='shift'" :selectDay="date" />
         <ViewDay v-if="picked=='day'" :selectDay="date" />
         <ViewRange v-if="picked=='range'" :range="range" />
       </div>
@@ -59,13 +59,16 @@ export default {
   },
   data() {
     return {
+      timer: null,
       range: {},
       date: null,
       picked: "shift",
+      error: true,
+      wd: -1
     };
   },
   watch: {
-    picked: function(val) {
+    picked: function (val) {
       /*
       switch(val){
         case "shift":
@@ -75,6 +78,39 @@ export default {
       if (val == "day") this.range = {};
       else this.date = null;*/
     }
+  },
+  methods: {
+    watchdog() {
+      this.$http
+        .post(this.$store.state.host + "getTest.php", {
+        })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          //console.log(data['test'][0]['test']);
+          if (this.wd == -1) {
+            this.wd = data['test'][0]['test'];
+          } else {
+            if (data['test'][0]['test'] != this.wd) {
+              this.error = false;
+              this.wd = data['test'][0]['test'];
+            } else {
+              this.error = true;
+            }
+          }
+        })
+    }
+  },
+  created() {
+    var self = this;
+    this.timer = setInterval(function () {
+      self.watchdog();
+    }, 10000);
+    self.watchdog();
+  },
+  beforeDestroy() {
+    clearInterval(this.timer);
   }
 };
 </script>
@@ -83,5 +119,11 @@ export default {
 @import "vuelendar/scss/vuelendar.scss";
 nav {
   margin-bottom: 10px;
+}
+.ok {
+  color: rgb(221, 255, 221) !important;
+}
+.fault {
+  color: rgb(255, 199, 199) !important;
 }
 </style>

@@ -71,14 +71,13 @@ export default {
       return this.$store.state.norm;
     },
     mercuriy() {
-      return this.mercuriyA + this.mercuriyR;
+      return this.mercuriyA;
     }
   },
   methods: {
     updateValue() {
       this.$http
-        .post("http://c98744oh.beget.tech/getByShift.php", {
-          //.post("http://bricks.loc/get.php",{
+        .post(this.$store.state.host + "getByShift.php", {
           dt: this.selectDay,
           starthour: this.shift.shiftStartHour,
           startminute: this.shift.shiftStartMinute,
@@ -89,7 +88,12 @@ export default {
           return response.json();
         })
         .then(function (data) {
-          //console.log(data);
+
+          this.mercuriyA = 0;
+          this.mercuriyR = 0;
+          this.pulsar = 0;
+          this.cement = 0;
+          this.sand = 0;
           this.bricks = data.bricks;
           if (this.chartOptions.series.length < 1)
             this.chartOptions.series.push({
@@ -159,11 +163,11 @@ export default {
 
           let tenzo = data.tenzo;
           if (tenzo.length > 0) {
-            this.cement = tenzo.reduce((sum, elem) => { return parseInt(sum) + parseInt(elem["tenzo"])-6 }, 0);
+            this.cement = tenzo.reduce((sum, elem) => { return parseInt(sum) + parseInt(elem["tenzo"]) - 6 }, 0);
           }
           let rifey = data.rifey;
           if (rifey.length > 0) {
-            this.sand = rifey.reduce((sum, elem) => { return parseInt(sum) + parseInt(elem["rifey"]) -20}, 0);
+            this.sand = rifey.reduce((sum, elem) => { return parseInt(sum) + parseInt(elem["rifey"]) - 20 }, 0);
           }
         });
     }

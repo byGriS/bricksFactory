@@ -7,9 +7,9 @@ namespace Bricks {
     public float PR { get; set; } = -1;
     public float Tenzo { get; set; } = -1;
     public float MercuriyA { get; set; } = -1;
-    public float MercuriyR { get; set; } = -1;
     public float Pulsar { get; set; } = -1;
     public float Rifey { get; set; } = -1;
+    public float ExpandedClay { get; set; } = -1;
 
     public bool shipped { get; set; }
 
@@ -21,10 +21,11 @@ namespace Bricks {
         result += ",\"tenzo\": \"" + Tenzo + "\"";
       if (MercuriyA != -1)
         result += ",\"mercuriyA\": \"" + MercuriyA + "\"";
-      if (MercuriyR != -1)
-        result += ",\"mercuriyR\": \"" + MercuriyR + "\"";
+     
       if (Pulsar != -1)
         result += ",\"pulsar\": \"" + Pulsar + "\"";
+      if (ExpandedClay != -1)
+        result += ",\"clay\": \"" + ExpandedClay + "\"";
       if (Rifey != -1)
         result += ",\"rifey\": \"" + Rifey + "\"";
       result += "}";

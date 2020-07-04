@@ -15,7 +15,7 @@ if (!empty($data)) {
     SqlDB::SQLExecute($command);
   }
   if (isset($data['rifey'])) {
-    $command = "insert into rifeycounter (dt, rifey) values ('" . $data['dt'] . "', '" . $data['rifey'] . "')";
+    $command = "insert into rifeycounter (dt, rifey, clay) values ('" . $data['dt'] . "', '" . $data['rifey'] . "', '" . $data['clay'] . "')";
     SqlDB::SQLExecute($command);
   }
   if (isset($data['tenzo'])) {

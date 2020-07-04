@@ -39,13 +39,13 @@ export default {
       return this.bricks.length;
     },
     mercuriy() {
-      return this.mercuriyA + this.mercuriyR;
+      return this.mercuriyA;
     }
   },
   methods: {
     updateValue() {
       this.$http
-        .post("http://c98744oh.beget.tech/range.php", {
+        .post(this.$store.state.host + "range.php", {
           dt1: this.range.start,
           dt2: this.range.end
         })
