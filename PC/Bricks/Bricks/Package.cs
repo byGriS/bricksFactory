@@ -6,7 +6,7 @@ namespace Bricks {
 
     public float PR { get; set; } = -1;
     public float Tenzo { get; set; } = -1;
-    public float MercuriyA { get; set; } = -1;
+    public int MercuriyA { get; set; } = -1;
     public float Pulsar { get; set; } = -1;
     public float Rifey { get; set; } = -1;
     public float ExpandedClay { get; set; } = -1;

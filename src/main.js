@@ -6,7 +6,7 @@ import HighchartsVue from 'highcharts-vue'
 import Highcharts from 'highcharts';
 
 import store from './stores/store'
-
+import router from './routes/router';
 
 Vue.prototype.$moment = moment;
 Vue.config.productionTip = false
@@ -45,5 +45,6 @@ Highcharts.setOptions({
 
 new Vue({
   store: store,
+  router,
   render: function (h) { return h(App) },
 }).$mount('#app')

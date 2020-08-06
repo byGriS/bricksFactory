@@ -1,28 +1,11 @@
 <template>
   <div>
-    <h3>Затраты</h3>
-    <div class="row">
-      <div class="col-md-2">Эл. энергия, Вт</div>
-      <div class="col-md-1">{{mercuriy}}</div>
-    </div>
-    <div class="row">
-      <div class="col-md-2">Вода, л</div>
-      <div class="col-md-1">{{pulsar}}</div>
-    </div>
-    <div class="row">
-      <div class="col-md-2">Цемент, кг</div>
-      <div class="col-md-1">{{cement}}</div>
-    </div>
-    <div class="row">
-      <div class="col-md-2">Песок+керамзит, кг</div>
-      <div class="col-md-1">{{sand}}</div>
-    </div>
+    <h2 v-if="loading">Загрузка данных ...</h2>
     <h2>Общее кол-во резов за период: {{countBricks}}</h2>
   </div>
 </template>
 <script>
 export default {
-  props: { range: "" },
   data() {
     return {
       timer: null,
@@ -31,7 +14,9 @@ export default {
       mercuriyR: 0,
       pulsar: 0,
       cement: 0,
-      sand: 0
+      clay: 0,
+      sand: 0,
+      loading: false
     };
   },
   computed: {
@@ -39,11 +24,15 @@ export default {
       return this.bricks.length;
     },
     mercuriy() {
-      return this.mercuriyA;
+      return this.mercuriyA / 1000.0;
+    },
+    range(){
+      return this.$store.state.range;
     }
   },
   methods: {
     updateValue() {
+      this.loading = true;
       this.$http
         .post(this.$store.state.host + "range.php", {
           dt1: this.range.start,
@@ -53,44 +42,57 @@ export default {
           return response.json();
         })
         .then(function (data) {
-          this.mercuriyA = 0;
-          this.mercuriyR = 0;
-          this.pulsar = 0;
-          this.cement = 0;
-          this.sand = 0;
+          this.$store.state.mercuriyA = 0;
+          //this.$store.state.mercuriyR = 0;
+          this.$store.state.pulsar = 0;
+          this.$store.state.cement = 0;
+          this.$store.state.clay = 0;
+          this.$store.state.sand = 0;
           this.bricks = data.bricks;
           let counters = data.counters;
           if (counters.length > 0) {
-            this.mercuriyA = counters[counters.length - 1]["mercuriyA"] - counters[0]["mercuriyA"];
-            this.mercuriyR = counters[counters.length - 1]["mercuriyR"] - counters[0]["mercuriyR"];
-            this.pulsar = counters[counters.length - 1]["pulsar"] - counters[0]["pulsar"];
+            this.$store.state.mercuriyA = counters[counters.length - 1]["mercuriyA"] - counters[0]["mercuriyA"];
+            //this.$store.state.mercuriyR = counters[counters.length - 1]["mercuriyR"] - counters[0]["mercuriyR"];
+            this.$store.state.pulsar = (counters[counters.length - 1]["pulsar"] - counters[0]["pulsar"]) / 1000.0;
           }
 
           let tenzo = data.tenzo;
           if (tenzo.length > 0) {
-            this.cement = tenzo.reduce((sum, elem) => { return parseInt(sum) + parseInt(elem["tenzo"])-6 }, 0);
+            this.$store.state.cement = tenzo.reduce((sum, elem) => { return parseInt(sum) + parseInt(elem["tenzo"]) - 6 }, 0);
           }
           let rifey = data.rifey;
           if (rifey.length > 0) {
-            this.sand = rifey.reduce((sum, elem) => { return parseInt(sum) + parseInt(elem["rifey"])-20 }, 0);
+            let notNullClay = 0;
+            var max = rifey.reduce((sum, elem) => {
+              if (elem['clay'] == 0)
+                elem['clay'] = notNullClay;
+              else
+                notNullClay = elem['clay'];
+              sum.total += elem["rifey"] - 30;
+              sum.preClay += notNullClay - 30;
+              return sum;
+            }, { total: 0, preClay: 0 });
+            this.$store.state.sand = max.total - max.preClay;
+            this.$store.state.clay = max.preClay;
           }
+          this.loading = false;
         });
+      this.$http.post(this.$store.state.host + "getShiftsDataDay.php", {
+        dt: this.range.start
+      })
+        .then(function (response) {
+          if (response.data.length > 0) {
+            this.$store.state.countBlocks = response.data[0]['brickcount'];
+          } else {
+            this.$store.state.countBlocks = 4;
+          };
+        })
     }
   },
   watch: {
-    selectDay: function (val) {
+    range(){
       this.updateValue();
     }
-  },
-  created() {
-    var self = this;
-    this.timer = setInterval(function () {
-      self.updateValue();
-    }, 3000);
-    self.updateValue();
-  },
-  beforeDestroy() {
-    clearInterval(this.timer);
   }
 }
 </script>

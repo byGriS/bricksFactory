@@ -1,42 +1,21 @@
 <template>
   <div>
-    <nav class="navbar navbar-dark bg-dark sticky-top">
+    <nav class="navbar navbar-expand navbar-dark bg-dark sticky-top">
       <div class="container">
-        <a class="navbar-brand" :class="error?'fault':'ok'" href="/">Производство</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <div class="navbar-nav mr-auto">
+            <a class="navbar-brand" :class="error?'fault':'ok'" href="/">Производство</a>
+          </div>
+          <div class>
+            <router-link  v-if="isAdmin" to="data" class="mr-3 btn btn-info">База данных</router-link>
+            <button v-if="!isAdmin" class="btn btn-success" @click="toAdmin()">Админ</button>
+            <button v-if="isAdmin" class="btn btn-primary" @click="toStaff()">Сотрудник</button>
+          </div>
+        </div>
       </div>
     </nav>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-4">
-          <label>Вариан просмотра</label>
-          <br />
-          <input type="radio" id="workShift" value="shift" v-model="picked" />
-          <label for="workShift">За смену</label>
-          <br />
-          <input type="radio" id="perDay" value="day" v-model="picked" />
-          <label for="perDay">За день</label>
-          <br />
-          <input type="radio" id="perRange" value="range" v-model="picked" />
-          <label for="perRange">За диапазон</label>
-        </div>
-        <div class="col-md-4">
-          <Shift v-if="picked=='shift'" />
-        </div>
-        <div class="col-md-4">
-          <div v-if="picked=='day' || picked=='shift'">
-            <v-day-selector v-model="date" />
-          </div>
-          <div v-else>
-            <v-range-selector :start-date.sync="range.start" :end-date.sync="range.end" />
-          </div>
-        </div>
-      </div>
-      <div class>
-        <ViewShift v-if="picked=='shift'" :selectDay="date" />
-        <ViewDay v-if="picked=='day'" :selectDay="date" />
-        <ViewRange v-if="picked=='range'" :range="range" />
-      </div>
-    </div>
+  <router-view></router-view>
+    
   </div>
 </template>
 
@@ -50,33 +29,17 @@ import ViewRange from "./components/ViewRange";
 
 export default {
   components: {
-    VRangeSelector,
-    VDaySelector,
-    Shift,
-    ViewShift,
-    ViewDay,
-    ViewRange
   },
   data() {
     return {
       timer: null,
-      range: {},
-      date: null,
-      picked: "shift",
       error: true,
       wd: -1
     };
   },
-  watch: {
-    picked: function (val) {
-      /*
-      switch(val){
-        case "shift":
-          this.date = null;
-          this.range = {};
-      }
-      if (val == "day") this.range = {};
-      else this.date = null;*/
+  computed: {
+    isAdmin() {
+      return this.$store.state.isAdmin;
     }
   },
   methods: {
@@ -88,7 +51,6 @@ export default {
           return response.json();
         })
         .then(function (data) {
-          //console.log(data['test'][0]['test']);
           if (this.wd == -1) {
             this.wd = data['test'][0]['test'];
           } else {
@@ -100,6 +62,21 @@ export default {
             }
           }
         })
+    },
+    toAdmin() {
+      let pass = prompt("Введите пароль");
+      if (pass == "") return;
+
+      this.$http.post(this.$store.state.host + "checkAdmin.php", {
+        password: pass
+      })
+        .then(function (response) {
+          if (response.data == 1)
+            this.$store.state.isAdmin = true;
+        })
+    },
+    toStaff() {
+      this.$store.state.isAdmin = false;
     }
   },
   created() {

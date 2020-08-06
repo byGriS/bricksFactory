@@ -1,27 +1,10 @@
 <template>
   <div>
-    <h3>Затраты</h3>
-    <div class="row">
-      <div class="col-md-2">Эл. энергия, Вт</div>
-      <div class="col-md-1">{{mercuriy}}</div>
-    </div>
-    <div class="row">
-      <div class="col-md-2">Вода, л</div>
-      <div class="col-md-1">{{pulsar}}</div>
-    </div>
-    <div class="row">
-      <div class="col-md-2">Цемент, кг</div>
-      <div class="col-md-1">{{cement}}</div>
-    </div>
-    <div class="row">
-      <div class="col-md-2">Песок+керамзит, кг</div>
-      <div class="col-md-1">{{sand}}</div>
-    </div>
     <h3>Общее кол-во резов: {{countBricks}}</h3>
     <highcharts :options="chartOptions"></highcharts>
-    <!--<div>
+    <div>
       <list-bricks :bricks="bricks" />
-    </div>-->
+    </div>
   </div>
 </template>
 <script>
@@ -38,9 +21,7 @@ export default {
       bricks: [],
       chartOptions: {
         chart: { type: "line" },
-        credits: {
-          enabled: false
-        },
+        credits: { enabled: false },
         title: { text: "" },
         xAxis: { type: "datetime" },
         yAxis: { title: { text: "" } },
@@ -53,11 +34,6 @@ export default {
           }
         ]
       },
-      mercuriyA: 0,
-      mercuriyR: 0,
-      pulsar: 0,
-      cement: 0,
-      sand: 0
     };
   },
   computed: {
@@ -71,14 +47,19 @@ export default {
       return this.$store.state.norm;
     },
     mercuriy() {
-      return this.mercuriyA;
+      return this.mercuriyA / 1000.0;
     }
   },
   methods: {
     updateValue() {
+      let dt2 = this.selectDay;
+      if (parseInt(this.shift.shiftEndHour) < parseInt(this.shift.shiftStartHour)) {
+        dt2 = this.$moment(this.selectDay).add(1, 'day').format('YYYY-MM-DD');
+      }
       this.$http
         .post(this.$store.state.host + "getByShift.php", {
-          dt: this.selectDay,
+          dt1: this.selectDay,
+          dt2: dt2,
           starthour: this.shift.shiftStartHour,
           startminute: this.shift.shiftStartMinute,
           endhour: this.shift.shiftEndHour,
@@ -88,18 +69,20 @@ export default {
           return response.json();
         })
         .then(function (data) {
-
-          this.mercuriyA = 0;
-          this.mercuriyR = 0;
-          this.pulsar = 0;
-          this.cement = 0;
-          this.sand = 0;
+          this.$store.state.mercuriyA = 0;
+          this.$store.state.mercuriyR = 0;
+          this.$store.state.pulsar = 0;
+          this.$store.state.cement = 0;
+          this.$store.state.clay = 0;
+          this.$store.state.sand = 0;
           this.bricks = data.bricks;
+          this.$store.state.totalBlocks = data.bricks.length;
           if (this.chartOptions.series.length < 1)
             this.chartOptions.series.push({
               marker: { enabled: false, symbol: null },
               name: "Резы",
-              data: []
+              data: [],
+              turboThreshold: 0
             });
 
           var indexSeries = 2; //первая линий - сами блоки, вторая линия - отклонение
@@ -156,18 +139,29 @@ export default {
           // counters
           let counters = data.counters;
           if (counters.length > 0) {
-            this.mercuriyA = counters[counters.length - 1]["mercuriyA"] - counters[0]["mercuriyA"];
-            this.mercuriyR = counters[counters.length - 1]["mercuriyR"] - counters[0]["mercuriyR"];
-            this.pulsar = counters[counters.length - 1]["pulsar"] - counters[0]["pulsar"];
+            this.$store.state.mercuriyA = counters[counters.length - 1]["mercuriyA"] - counters[0]["mercuriyA"];
+            this.$store.state.mercuriyR = counters[counters.length - 1]["mercuriyR"] - counters[0]["mercuriyR"];
+            this.$store.state.pulsar = (counters[counters.length - 1]["pulsar"] - counters[0]["pulsar"]) / 1000.0;
           }
 
           let tenzo = data.tenzo;
           if (tenzo.length > 0) {
-            this.cement = tenzo.reduce((sum, elem) => { return parseInt(sum) + parseInt(elem["tenzo"]) - 6 }, 0);
+            this.$store.state.cement = tenzo.reduce((sum, elem) => { return parseInt(sum) + parseInt(elem["tenzo"]) - 6 }, 0);
           }
           let rifey = data.rifey;
           if (rifey.length > 0) {
-            this.sand = rifey.reduce((sum, elem) => { return parseInt(sum) + parseInt(elem["rifey"]) - 20 }, 0);
+            let notNullClay = 0;
+            var max = rifey.reduce((sum, elem) => {
+              if (elem['clay'] == 0)
+                elem['clay'] = notNullClay;
+              else
+                notNullClay = elem['clay'];
+              sum.total += elem["rifey"] - 30;
+              sum.preClay += notNullClay - 30;
+              return sum;
+            }, { total: 0, preClay: 0 });
+            this.$store.state.sand = max.total - max.preClay;
+            this.$store.state.clay = max.preClay;
           }
         });
     }
@@ -201,7 +195,7 @@ export default {
     this.chartOptions.series = [];
     this.timer = setInterval(function () {
       self.updateValue();
-    }, 3000);
+    }, 10000);
     self.updateValue();
   },
   beforeDestroy() {
